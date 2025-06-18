@@ -47,7 +47,7 @@ type SubnetInfo struct {
 
 // Get HNSNetwork from NetworkInfo
 func (info *NetworkInfo) GetHNSNetworkConfig() *hcsshim.HNSNetwork {
-	subnets := []hcsshim.Subnet{}
+	subnets := make([]hcsshim.Subnet, 0, len(info.Subnets))
 	for _, subnet := range info.Subnets {
 		subnets = append(subnets, *subnet.GetHNSSubnetConfig())
 	}
@@ -66,7 +66,7 @@ func (info *NetworkInfo) GetHNSNetworkConfig() *hcsshim.HNSNetwork {
 
 // Get NetworkInfo from HNSNetwork
 func GetNetworkInfo(hnsNetwork *hcsshim.HNSNetwork) *NetworkInfo {
-	var subnets []SubnetInfo
+	subnets := make([]SubnetInfo, 0, len(hnsNetwork.Subnets))
 	for _, subnet := range hnsNetwork.Subnets {
 		subnets = append(subnets, GetSubnetInfo(&subnet))
 	}
@@ -104,7 +104,7 @@ func (subnet *SubnetInfo) GetHNSSubnetConfig() *hcsshim.Subnet {
 
 // GetPolicies
 func GetNetworkPolicies(jsonPolicies []json.RawMessage) []Policy {
-	var policies []Policy
+	policies := make([]Policy, 0, len(jsonPolicies))
 	for _, jsonPolicy := range jsonPolicies {
 		policies = append(policies,  Policy{Type:NetworkPolicy, Data:jsonPolicy})
 	}
@@ -114,7 +114,7 @@ func GetNetworkPolicies(jsonPolicies []json.RawMessage) []Policy {
 
 // GetHNSPolicies
 func GetHNSNetworkPolicies(policies []Policy) []json.RawMessage {
-	var jsonPolicies []json.RawMessage
+	jsonPolicies := make([]json.RawMessage, 0, len(policies))
 	for _, policy := range policies {
 		if policy.Type == NetworkPolicy {
 			jsonPolicies = append(jsonPolicies, policy.Data)

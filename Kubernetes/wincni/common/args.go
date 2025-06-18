@@ -109,7 +109,7 @@ func printHelpForArg(arg *Argument) {
 	if arg.ValueMap != nil {
 		left += fmt.Sprintf("=%v", arg.DefaultValue)
 
-		var values []string
+		values := make([]string, 0, len(arg.ValueMap))
 		for k := range arg.ValueMap {
 			values = append(values, k)
 		}

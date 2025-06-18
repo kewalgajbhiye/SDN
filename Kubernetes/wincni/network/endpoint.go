@@ -80,7 +80,7 @@ func (endpoint *EndpointInfo) HotDetachEndpoint(containerID string) error {
 
 // GetPolicies
 func GetEndpointPolicies(jsonPolicies []json.RawMessage) []Policy {
-	var policies []Policy
+	policies := make([]Policy, 0, len(jsonPolicies))
 	for _, jsonPolicy := range jsonPolicies {
 		policies = append(policies,  Policy{Type:EndpointPolicy, Data:jsonPolicy})
 	}
@@ -90,7 +90,7 @@ func GetEndpointPolicies(jsonPolicies []json.RawMessage) []Policy {
 
 // GetHNSPolicies
 func GetHNSEndpointPolicies(policies []Policy) []json.RawMessage {
-	var jsonPolicies []json.RawMessage
+	jsonPolicies := make([]json.RawMessage, 0, len(policies))
 	for _, policy := range policies {
 		if policy.Type == EndpointPolicy {
 			jsonPolicies = append(jsonPolicies, policy.Data)

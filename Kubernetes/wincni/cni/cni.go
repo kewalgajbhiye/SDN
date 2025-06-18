@@ -194,12 +194,14 @@ func (config *NetworkConfig) GetNetworkInfo() *network.NetworkInfo {
 		},
 	}
 	if config.AdditionalArgs != nil {
+		policies := make([]network.Policy, 0, len(config.AdditionalArgs))
 		for _, kvp := range config.AdditionalArgs {
 			if strings.Contains(kvp.Name, "Policy") {
 				npolicy := network.Policy{Type: network.CNIPolicyType(kvp.Name), Data: kvp.Value}
-				ninfo.Policies = append(ninfo.Policies, npolicy)
+				policies = append(policies, npolicy)
 			}
 		}
+		ninfo.Policies = policies
 	}
 
 	return ninfo
@@ -232,10 +234,14 @@ func (config *NetworkConfig) GetEndpointInfo(
 
 	runtimeConf := config.RuntimeConfig
 	logrus.Debugf("Parsing port mappings from %+v", runtimeConf.PortMappings)
-	for _, mapping := range runtimeConf.PortMappings {
-		natPolicy := network.GetHNSNatPolicy(mapping.HostPort, mapping.ContainerPort, mapping.Protocol)
-		logrus.Debugf("Created raw policy from mapping: %+v --- %+v", mapping, natPolicy)
-		epInfo.Policies = append(epInfo.Policies, natPolicy)
+	if len(runtimeConf.PortMappings) > 0 {
+		policies := make([]network.Policy, 0, len(runtimeConf.PortMappings))
+		for _, mapping := range runtimeConf.PortMappings {
+			natPolicy := network.GetHNSNatPolicy(mapping.HostPort, mapping.ContainerPort, mapping.Protocol)
+			logrus.Debugf("Created raw policy from mapping: %+v --- %+v", mapping, natPolicy)
+			policies = append(policies, natPolicy)
+		}
+		epInfo.Policies = policies
 	}
 
 	return epInfo
